@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Local de votação – Operação Eleições 2026 – 3ºBPM</title>
+<style>
+  :root { --verde:#1f5e3a; --verde2:#2f7d50; --fundo:#f3f5f4; --texto:#1c2420; --borda:#cfd8d3; --erro:#a12a2a; --aviso:#8a5a00; --avisoBg:#fff4d6; --okBg:#e3f3e9; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--fundo); color:var(--texto); font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif; }
+  header { background:var(--verde); color:#fff; padding:18px 16px; }
+  header h1 { margin:0; font-size:1.15rem; }
+  header p { margin:4px 0 0; font-size:.9rem; opacity:.9; }
+  main { max-width:560px; margin:0 auto; padding:16px; }
+  .cartao { background:#fff; border:1px solid var(--borda); border-radius:10px; padding:16px; margin-bottom:14px; }
+  label { display:block; font-weight:600; margin:12px 0 4px; }
+  label:first-child { margin-top:0; }
+  input, select, textarea { width:100%; padding:11px 12px; font:inherit; border:1px solid var(--borda); border-radius:8px; background:#fff; color:inherit; }
+  input:focus, select:focus, textarea:focus { outline:2px solid var(--verde2); outline-offset:1px; }
+  button { width:100%; margin-top:14px; padding:13px; font:inherit; font-weight:700; color:#fff; background:var(--verde); border:0; border-radius:8px; cursor:pointer; }
+  button:disabled { opacity:.55; cursor:default; }
+  button.sec { background:#fff; color:var(--verde); border:1px solid var(--verde); }
+  .dica { font-size:.85rem; color:#56635c; margin-top:4px; }
+  .msg { border-radius:8px; padding:11px 12px; margin-top:12px; font-size:.95rem; }
+  .aviso { background:var(--avisoBg); color:var(--aviso); }
+  .erro { background:#fbe6e6; color:var(--erro); }
+  .ok { background:var(--okBg); color:var(--verde); }
+  .ficha { background:var(--okBg); border-radius:8px; padding:11px 12px; margin-top:12px; }
+  .ficha strong { display:block; }
+  .opcoes { display:flex; gap:10px; }
+  .opcoes label { flex:1; margin:0; font-weight:500; border:1px solid var(--borda); border-radius:8px; padding:11px; display:flex; gap:8px; align-items:center; cursor:pointer; }
+  .opcoes input { width:auto; }
+  [hidden] { display:none !important; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Operação Eleições 2026 – 3ºBPM</h1>
+  <p>Informe onde você vota. Usaremos as respostas para tentar ajustar a escala de 04/10/2026.</p>
+</header>
+<main>
+
+  <section class="cartao" id="passo1">
+    <label for="matricula">Sua matrícula</label>
+    <input id="matricula" inputmode="text" autocomplete="off" placeholder="Ex.: 30012345 ou 1234567X">
+    <div class="dica">Digite só os números (e a letra final, se houver). Pontos e traços são ignorados.</div>
+    <button id="btnConsultar">Consultar</button>
+    <div id="msgConsulta" class="msg" hidden></div>
+  </section>
+
+  <section class="cartao" id="passo2" hidden>
+    <div id="ficha" class="ficha" hidden></div>
+
+    <div id="manual" hidden>
+      <label for="posto">Posto/graduação</label>
+      <select id="posto">
+        <option value="">Selecione</option>
+        <option>SD PM</option><option>CB PM</option><option>3º SGT PM</option><option>2º SGT PM</option>
+        <option>1º SGT PM</option><option>ST PM</option><option>2º TEN PM</option><option>1º TEN PM</option>
+        <option>CAP PM</option><option>MAJ PM</option><option>TC PM</option>
+      </select>
+      <label for="numeral">Numeral (se tiver)</label>
+      <input id="numeral" inputmode="numeric" autocomplete="off">
+      <label for="nome">Nome completo</label>
+      <input id="nome" autocomplete="off">
+      <label for="opm">Companhia</label>
+      <select id="opm">
+        <option value="">Selecione</option>
+        <option>1ªCIA/3ºBPM</option><option>2ªCIA/3ºBPM</option><option>3ªCIA/3ºBPM</option><option>4ªCIA/3ºBPM</option><option>3ºBPM (sede)</option>
+      </select>
+      <label for="escalado">Onde está escalado em 04/10 (se souber)</label>
+      <input id="escalado" autocomplete="off">
+    </div>
+
+    <label>Você vota em município da área do 3ºBPM?</label>
+    <div class="opcoes">
+      <label><input type="radio" name="area" value="SIM"> Sim</label>
+      <label><input type="radio" name="area" value="NÃO"> Não</label>
+    </div>
+
+    <div id="blocoArea" hidden>
+      <label for="municipio">Município onde vota</label>
+      <select id="municipio"><option value="">Selecione</option></select>
+      <label for="local">Local de votação</label>
+      <select id="local" disabled><option value="">Escolha primeiro o município</option></select>
+      <div id="blocoOutroLocal" hidden>
+        <label for="localTexto">Nome do local de votação</label>
+        <input id="localTexto" autocomplete="off">
+      </div>
+    </div>
+
+    <div id="blocoFora" hidden>
+      <label for="cidadeFora">Cidade/UF onde vota</label>
+      <input id="cidadeFora" autocomplete="off" placeholder="Ex.: Fortaleza/CE">
+      <div class="dica">Fora da área do 3ºBPM não é possível remanejar, mas o registro ajuda no planejamento.</div>
+    </div>
+
+    <label for="contato">Telefone (WhatsApp)</label>
+    <input id="contato" inputmode="tel" autocomplete="off" placeholder="(88) 9XXXX-XXXX">
+    <label for="obs">Observação (opcional)</label>
+    <textarea id="obs" rows="2"></textarea>
+
+    <button id="btnEnviar">Enviar</button>
+    <button id="btnVoltar" class="sec" type="button">Corrigir matrícula</button>
+    <div id="msgEnvio" class="msg" hidden></div>
+  </section>
+
+  <section class="cartao" id="passo3" hidden>
+    <div class="msg ok" style="margin-top:0"><strong>Resposta registrada.</strong><br>O remanejamento depende da disponibilidade de efetivo e não é garantido. Aguarde a escala atualizada.</div>
+    <button id="btnNovo" class="sec" type="button">Registrar outra matrícula</button>
+  </section>
+
+</main>
+<script>
+// >>> COLE AQUI O ENDEREÇO DO APLICATIVO DA WEB (termina em /exec) <<<
+var URL_SCRIPT = 'https://script.google.com/macros/s/AKfycbwEPhBtBKvrNe52YUfJGUBhHdCuGDy0NtujNegxkWK8QphOTYh2KnY25kAmsK3wzn6N/exec';
+
+var LOCAIS = {"SOBRAL": ["ANEXO AYRES DE SOUSA (SETOR III-JAIBARAS) (JAIBARAS)", "ANEXO CHICÓ FELICIANO (SANTO ANTONIO) (JORDÃO)", "ANEXO FLORISMINO GOMES PARENTE (BEIRA DO RIO) (SÃO JOSÉ DO TORTO)", "ANEXO JOAO PINTO DE OLIVEIRA (IPUEIRINHA) (JAIBARAS)", "ANEXO JOSE DE LOURDES VASCONCELOS (CONTENDAS) (JORDÃO)", "ANEXO JOSE FRANCISCO DE ALBUQUERQUE (PEDRA DE FOGO) (PEDRA DE FOGO)", "ANEXO JOSE OLAVO RIBEIRO DA SILVA (PEDRINHAS) (RAFAEL ARRUDA)", "ANEXO JOSE VICENTE PEREIRA(BOQUEIRAO) (RENATO PARENTE)", "ANEXO MANOEL MACHADO PORTELA (PAU D'ARCO) (APRAZÍVEL)", "ANEXO MIGUEL FERNANDES DE SOUSA (OURO BRANCO) (RAFAEL ARRUDA)", "ANEXO PROF JOSE FERREIRA GOMES (RECREIO) (RAFAEL ARRUDA)", "ANEXO RAIMUNDO DO CARMO ARRUDA (SITIO SANTANA) (JORDÃO)", "ANEXO SAO DOMINGOS (JAIBARAS)", "CAMARA DOS DIRIGENTES LOJISTAS CDL (CENTRO)", "CAMARA MUNICIPAL DE SOBRAL - ANEXO 2 (CENTRO)", "CEI FRANCISCO CLEMENTE BALBINO (VARJOTA DOS MACHADOS)", "CEI IVONIR AGUIAR (CENTRO)", "CEI JACYRA PIMENTEL GOMES (SINHÁ SABÓIA)", "CEJA - CENTRO DE EDUCACAO DE JOVENS E ADULTOS CECI CIALDINI (CENTRO)", "CENTRO DE CIÊNCIAS HUMANAS - CCH - UVA (JOSÉ EUCLIDES)", "CENTRO DE INOVAÇÃO CADEIA CRIATIVA DE SOBRAL (CENTRO)", "CENTRO EDUCACIONAL INFANTIL TEREZA RODRIGUES DOS SANTOS (NOVO RECANTO)", "CENTRO EDUCACIONAL MARIA IMACULADA(PATRONATO) (CENTRO)", "CLUBE DOS CALÇADISTAS (RENATO PARENTE)", "COLEGIO CORACAO DE JESUS (CORAÇÃO DE JESUS)", "COLEGIO FARIAS BRITO SOBRALENSE (CENTRO)", "COLEGIO SANT'ANA (CENTRO)", "CRAS REGINA JUSTA FEIJÃO (ANTIGO POLO ABC) (VILA UNIÃO)", "CURSO DE QUIMICA-UVA- CAMPUS CIDAO (JOCELY DANTAS)", "EEEP DOM WALFRIDO TEIXEIRA VIEIRA (LICEU DE SOBRAL) (JUVÊNCIO DE ANDRADE)", "EEEP LYSIA PIMENTEL GOMES (RENATO PARENTE)", "EEFI - CARMOSINA F. GOMES (CEDRO - JAIBARAS) (JAIBARAS)", "EEFI ANTENOR NASPOLINI (DOM JOSÉ)", "EEFI ANTONIO CUSTODIO AZEVEDO - APRAZIVEL (APRAZÍVEL)", "EEFI ANTONIO MENDES CARNEIRO (PARQUE SILVANA)", "EEFI CORONEL JOSE LEONCIO (JORDÃO)", "EEFI ELPIDIO RIBEIRO DA SILVA (SÃO JOSÉ DO TORTO)", "EEFI EMILIO SENDIM (DOMINGOS OLÍMPIO)", "EEFI JACIRA MENDES OLIVEIRA (JORDÃO)", "EEFI JOAQUIM BARRETO LIMA (SETOR I) (JAIBARAS)", "EEFI JOSE DA MATA E SILVA (JUNCO)", "EEFI JOSE INACIO GOMES PARENTE (JORDÃO)", "EEFI JOSE PARENTE PRADO (SUMARÉ)", "EEFI LEONILIA GOMES PARENTE (JAIBARAS)", "EEFI LUIS ALARICO PARENTE (TRAPIÁ - JAIBARAS) (JAIBARAS)", "EEFI MARIA JOSE FERREIRA GOMES (PADRE PALHANO)", "EEFI MARIA YEDA FROTA FELIX MONTALVERNE (JOSÉ EUCLIDES)", "EEFI MOCINHA RODRIGUES (JOSÉ EUCLIDES)", "EEFI NETINHA CASTELO (JUNCO)", "EEFI PADRE OSVALDO CHAVES (DOM EXPEDITO)", "EEFI PADRE PALHANO (PADRE PALHANO)", "EEFI PAULO ARAGAO (COHAB II)", "EEFI PEDRO JUSTINO (MARACAJÁ - JAIBARAS) (JAIBARAS)", "EEFI PROF. GERARDO RODRIGUES ALBUQUERQUE (JUNCO)", "EEFI RAIMUNDO PIMENTEL GOMES - CAIC (ALTO DA BRASÍLIA)", "EEFI RAIMUNDO SANTANA (JAIBARAS)", "EEFI RAUL MONTE (ALTO DA BRASÍLIA)", "EEFI TRAJANO DE MEDEIROS (LAVANDERIA) (EXPECTATIVA)", "EEFM DR JOAO RIBEIRO RAMOS (CENTRO)", "EEFM MONS. JOSE GERARDO FERREIRA GOMES(NOELIA) (COHAB I)", "EEM AGOSTINHO NERES PORTELA (RAFAEL ARRUDA)", "EEM AYRES DE SOUZA (SEDE) - ESCOLA NOVA (JAIBARAS)", "EEM DR JOSE EUCLIDES FERREIRA GOMES JUNIOR - JORDAO (JORDÃO)", "EEM MINISTRO JARBAS PASSARINHO (JOSÉ EUCLIDES)", "EEM PROF. LUIS FELIPE (CAMPO DOS VELHOS)", "EEM PROFESSOR ARRUDA (CENTRO)", "EEM PROFESSORA CARMOSINA FERREIRA GOMES (SUMARÉ)", "EEMTI DEP. CESARIO BARRETO LIMA (TAPERUABA)", "EEMTI ISRAEL LEOCADIO DE VASCONCELOS (ARACATIAÇU)", "EEMTI PREFEITO JOSE EUCLIDES F. GOMES JUNIOR- (ANTIGO CIRAO) (ALTO DO CRISTO)", "EEMTI SINHÁ SABOIA (DOM EXPEDITO)", "ESCOLA AGRÍCOLA PAULO DE ALMEIDA SANFORD (POLO JOSE ARIMATEIA ALVES (BONFIM)", "ESCOLA ARAUJO CHAVES (BILHEIRA)", "ESCOLA CARLOS JEREISSATI (SINHÁ SABÓIA)", "ESCOLA CASINHAS (POLO ODETE BARROSO) (CARACARÁ)", "ESCOLA DE TEMPO INTEGRAL EDGAR LINHARES (NOVA CAIÇARA)", "ESCOLA DINORAH TOMAZ RAMOS (CENTRO)", "ESCOLA ELDA CAVALCANTE LIMA - BONFIM (TEMPO INTEGRAL) (BONFIM)", "ESCOLA FRANCISCO MONTE (TAPERUABA)", "ESCOLA FREDERICO AUTO CORREIA (TAPERUABA)", "ESCOLA GERARDO LINHARES (POLO ODETE BARROSO) (PATOS)", "ESCOLA JOAO EVANGELISTA (POLO DELIZA LOPES) (PATOS)", "ESCOLA JOSE JULIO DE ANDRADE (POLO JOSE ARIMATEIA ALVES) (BONFIM)", "ESCOLA JOSE RODRIGUES DE SOUSA (POLO JOSÉ ARIMATEIA ALVES) (BONFIM)", "ESCOLA MANOEL MARINHO DE ANDRADE (CAIOCA)", "ESCOLA MARIA DO CARMO ANDRADE (PEDRINHAS)", "ESCOLA MASSILON SABOIA DE ALBUQUERQUE (TAPERUABA)", "ESCOLA ODETE BARROSO (CARACARÁ)", "ESCOLA ODETE BARROSO- PICADA (POLO ODETE BARROSO) (CARACARÁ)", "ESCOLA OSMAR DE SA PONTE (CENTRO)", "ESCOLA PAULO FREIRE (ARACATIAÇU)", "ESCOLA PERY FROTA - ANEXO CAUBI VASCONCELOS (PATRIARCA)", "ESCOLA PROF. MARIA DAS GRAÇAS TEIXEIRA PONTES (COHAB II)", "ESCOLA RAIMUNDO NONATO DE SALES (SALGADO DOS MACHADOS)", "ETI ALZIRA PAULO BRAGA (PATOS)", "ETI JOSÉ PEREGRINO DE VASCONCELOS (PATRIARCA)", "ETI MARIA DE LOURDES DE VASCONCELOS (ARACATIAÇU)", "ETI MARIA DORILENE ARRUDA ARAGAO (GERARDO CRISTINO)", "ETI VEREADOR JOSÉ MARIA FELIX (JAIBARAS)", "SESI (JUNCO)", "UFC CAMPUS MUCAMBINHO - BLOCO DAS ENGENHARIAS (CENTRO)", "UNIV.EST.VALE DO ACARAÚ- UVA-NÚCLEO DE DISCIPLINAS COMPLEMENTARES (JERÔNIMO PRADO)", "UNIVERSIDADE UNOPAR SOBRAL (CENTRO)"], "FORQUILHA": ["CERU-CENTRO DE EDUCACAO BASICA MARRINA MAGALHAES MARTINS", "EEF ANTONIO JOSE DE LOIOLA FILHO", "EEF DEP JOSE PARENTE PRADO(CENTRO SOCIAL)", "EEFI CAP JOSE DIOGO DE SIQUEIRA", "EEFI CESARIO ALVES PEREIRA (POLO ESCOLA MANOEL MENDES FERREIRA)", "EEFI DIOGO ALVES DE LOIOLA", "EEFI DR JOSE GRIJALBA MENDES CARNEIRO", "EEFI EDMUNDO RODRIGUES", "EEFI EDUARDO CAVALCANTE ARAGAO", "EEFI FRANCISCO FIGUEIREDO DE PAULA PESSOA", "EEFI FRANCISCO TEOTONIO ALVES PESSOA", "EEFI JOAO LOURETO DE SOUSA", "EEFI MANOEL MENDES FERREIRA", "EEFI MURILO LIRA ARAUJO", "EEFI RAIMUNDO VIEIRA DIAS (POLO ESCOLA EDUARDO CAVALCANTE ARAGAO)", "EEFI VICENTE REIS CAVALCANTE", "EEFM ELZA GOERSCH", "ESCOLA DE CIDADANIA MOESIO LOIOLA MELO JUNIOR(MODELO)"], "CARIRÉ": ["ASSOCIAÇÃO MUCAÚBA DE MUQUEM DE SÃO PEDRO", "CAGECE - ESCRITORIO", "E.E.F. FRANCISCO HERMINIO PONTE", "E.E.I.E.F. MANOEL ALVES DE ALMEIDA", "EEFM CEFISA AGUIAR", "EEFTI PROFESSOR LUIS DE SENA DIAS", "EEIEF MARIANA FRANÇA DE SOUSA", "ESCOLA DE ENSINO FUNDAMENTAL E MEDIO MARIETA CALS", "ESCOLA E.I.E.F ADAUTA MOSINHA (ANEXO)", "ESCOLA E.I.E.F INÁCIA RODRIGUES MOREIRA", "ESCOLA E.I.E.F MANOELRODRIGUES DOS SANTOS", "ESCOLA EIEF ADAUTA MOCINHA BARROS ROCHA", "ESCOLA EIEF CEL. JOAO FERNANDES", "ESCOLA EIEF DONA MARIA LUCAS", "ESCOLA EIEF ERNESTO ALEXANDRE DA SILVA", "ESCOLA EIEF ESTEVAO FERREIRA DA COSTA", "ESCOLA EIEF EVANGELINA FEIJAO", "ESCOLA EIEF FILINTO ELISIO AGUIAR", "ESCOLA EIEF JOSE DO PATROCINIO BRAGA", "ESCOLA EIEF LUCAS RODRIGUES DE BRITO", "ESCOLA EIEF MANOEL FERNANDES BEZERRA", "ESCOLA EIEF MANOEL LOPES DA CUNHA", "ESCOLA EIEF MARIA JOSE RODRIGUES PONTE", "ESCOLA EIEF MARIA MARLENE FEITOSA DE PAIVA", "ESCOLA EIEF MONS. ANTONIO CANDIDO DE MELO", "ESCOLA EIEF RAIMUNDA FERREIRA DO NASCIMENTO", "ESCOLA EIEF RAIMUNDO DICO MONTEIRO", "ESCOLA EIEF TENENTE AVELINO GOMES", "ESCOLA EIEF TIBURCIO DE BRITO", "SECRETARIA DE EDUCACAO DE CARIRÉ"], "GRAÇA": ["CENTRO COMUNITARIO JOAQUIM XIMENES", "COLEGIO RAIMUNDO DA CUNHA BRITO", "E.E. F. VITURINO FELIPE DE MARIA", "EEF JOAO SALMITO DE ALMEIDA", "EEF JOSE POMPILIO DAMASCENO", "EEF JOÃO ALVES DE ALCÂNTARA", "EEF PROF. MARIA DO AMPARO SOUSA", "EEF PROFESSOR ANTONIO GERONIMO DA SILVA", "ESCOLA PADRE RAIMUNDO NONATO RODRIGUES", "ESCOLA SANTA LUZIA", "GRUPO ESCOLAR FRANCISCO HONORATO DE SOUSA", "GRUPO ESCOLAR JOAO LOPES DE CARVALHO", "GRUPO ESCOLAR RITA ALVES DE SOUSA", "GRUPO VICENTE ALVES DE SOUSA", "UNIDADE BÁSICA DE SAÚDE - UBS JOSÉ XIMENES DE FARIAS"], "GROAÍRAS": ["CRECHE PRO INFANCIA FRANCISCA TORRES DE PAULA - GROAÍRAS", "EEF ALBERTO ALVES BEZERRA", "EEF DOMITILIA MARIA DA CONCEICAO", "EEF JOSE ANTONIO DE VASCONCELOS", "EEF LUIZ JOSE RODRIGUES", "EEF NOSSA SENHORA DO ROSARIO", "EEF PROFESSORA JULIA ELISA FARIAS", "EEF PROFESSORA NOELIA XIMENES PARENTE", "EEFM MONSENHOR LINHARES", "UBS - JOSÉ CORNELIO XIMENES MATOS", "UBS - PEDRO RODRIGUES DE LIMA"], "MUCAMBO": ["CENTRO EDUCACIONAL DEP MANOEL RODRIGUES", "E.E.I.F. RAFAEL CLAUDIO DE ARAUJO", "E.E.M. JOSÉ CLÁUDIO DE ARAÚJO", "EEIEF JOÃO CAVALCANTE DE ALBUQUERQUE", "ESCOLA ANTONIA FERREIRA DOS SANTOS", "ESCOLA ELZE MENDES DE AGUIAR", "ESCOLA FRANCISCO RICARDO DA SILVA", "ESCOLA JOAO SILVERIO DE AZEVEDO", "ESCOLA JOSE DOMINGOS DE ALCANTARA", "ESCOLA RAIMUNDO FELIX DA PONTE", "UNIDADE BÁSICA DE SAÚDE - UBS DR.PEDRO MAURÍCIO AGUIAR MELO"], "PACUJÁ": ["E.E.F. ACHILLES BARRETO", "E.E.F. SAO JOAO BATISTA", "E.E.F. VICENTE ALVES DE SOUSA FILHO", "E.E.I FRANCISCO JOAQUIM CORDEIRO", "E.E.I.F. CORIOLANO ALVES DE BRITO", "E.E.I.F. VALFRIDO SALMITO DE ALMEIDA", "E.E.M. PLACIDO ADERALDO CASTELO"], "MASSAPÊ": ["ASSOCIAÇÃO COMUNITÁRIA DOS MORADORES DO ARRAIAL", "CENTRO COMUNITARIO FRANCISCO CANUTO", "CENTRO DE APOIO COMUNITÁRIO MANOEL ESTANISLAU DE ARAÚJO", "CENTRO EDUCACIONAL MASSAPEENSE", "CEPRUMA", "CMEF PROFESSORA MARIA DO CARMO CARNEIRO (EEF MARIA PONTES VIDAL)", "CRECHE JOSE CLAUDIO DE AGUIAR", "CRECHE JOSE PEREGRINO DE SOUZA", "CRECHE MONSENHOR LINHARES", "E.M.T.I FRANCISCO SEVERO DE ARAÚJO", "EEEP FRANCISCA NEILYTA CARNEIRO ALBUQUERQUE", "EEF ADALBERTO ALBUQUERQUE", "EEF DR. ALFREDO LOPES", "EEF FRANCISCA DIOGO GOMES", "EEF FRANCISCO RODRIGUES DO CARMO", "EEF FRANKLIN JUNIOR DE SOUSA", "EEF GERARDO EMILIANO", "EEF MANOEL RAMOS DO NASCIMENTO", "EEF MARIA SOFIA TOMÉ", "EEF PEDRO RUFINO FURTADO", "EEF SANTO ANTONIO", "EEF SAO FRANCISCO", "EEF SAO JOSE", "EEFM ADAUTO BEZERRA", "EEFM WILEBALDO AGUIAR", "EM CORIOLANO GOMES FROTA", "EM MARIA LAURA SOARES FROTA", "EMEF AURELIANO LOPES", "ESCOLA MUNICIPAL LUIZ GONZAGA CAMILO", "GE ANTONIO DE PAULA PESSOA DE FIGUEIREDO", "GE JOSE ESTEVAO VASCONCELOS", "GEEST DE PADRE LINHARES", "GEM BRAS SATIRO", "GEM DE MERUOQUINHA", "GEM JOSE RODRIGUES DE SOUSA", "GEM OZEAS ALVES DE SOUZA", "GEST MONS. MANOEL HENRIQUES", "GM FRANCISCO ALMEIDA MONTE", "SECRETARIA DE EDUCACAO DO MUNICIPIO"], "ALCÂNTARAS": ["CRAS - CENTRO DE REFERENCIA DA ASSISTENCIA SOCIAL", "EEF INOCÊNCIA ALCÂNTARA FREIRE", "EEFI FRANCISCO REINALDO DE MARIA", "EEFI JOSE DAVID PORTELA", "EEFI JOSE NAPOLEAO XIMENES", "EEFI MARIA DOS SANTOS MOREIRA", "EEFI MONSENHOR JOSÉ FURTADO", "EEFI PEROLINA FERNANDES ALBUQUERQUE", "EEIEF MARIA RAULINO ALCÂNTARA DE CARVALHO", "EEM FRANCISCO DE ALMEIDA MONTE", "SECRETARIA MUNICIPAL DE EDUCACAO DE ALCÂNTARAS"], "COREAÚ": ["AGROVILA 2000 - PRÉDIO DA ESCOLA MUNICIPAL", "ARAQUÉM - CEI SANTA RITA", "ARAQUÉM - ESCOLA ESTADUAL Mª MENEZES CRISTINO", "ARAQUÉM - ESCOLA MUN. STO. ANTÔNIO", "AROEIRAS - ESCOLA MUN. CORAÇÃO DE JESUS", "BOQUEIRÃO - ESCOLA MUN. VER. RDO. CARDOSO DE ALBUQUERQUE", "CANTO - ESCOLA MUN. SÃO JOAQUIM", "COREAÚ - (GINASIO) ESCOLA MUN. NOSSA SRA. DA PIEDADE", "COREAÚ - (LUZIA) CENTRO DE EDUÇÃO BÁSICA PE. JOSÉ Mª DE AGUIAR", "COREAÚ - BREGUEDOFF CEI PROFª Mª ZILMAR", "COREAÚ - CAEE (CENTRO EDUCACIONAL ESPECIALIZADO)", "COREAÚ - CEI MA. SOCORRO ARAÚJO GOMES", "COREAÚ - CENTRO EDUCACIONAL SÃO FCO. DE ASSIS", "COREAÚ - CRAS", "COREAÚ - ESCOLA ESTADUAL VILEBALDO AGUIAR", "COREAÚ - ESCOLA MUN. ALTO DO LIMOEIRO", "COREAÚ - ESCOLA MUN. NOSSA SRA. DA PAZ", "COREAÚ - ESCOLA MUN. PROFª IZAURA MA. DA SILVA", "COREAÚ - SECRETARIA MUNICIPAL DE EDUCAÇÃO", "CORREDORES - ESCOLA MUN. CEL. ANTº TELES", "CUNHASSU DO SALES - ESCOLA MUN. JOSÉ DE SALES", "CUNHASSU VELHO - PRÉDIO DA ESCOLA MUNICIPAL", "FEITORIA - PRÉDIO DA ESCOLA MUNICIPAL", "LAGOA DO BARRO - PRÉDIO DA ESCOLA MUNICIPAL", "LAJEIRO - ESCOLA MUN. REINALDO PIMENTA", "MALHADA VERMELHA - CENTRO PASTORAL STA. RITA DE CÁSSIA", "MOTA - ESCOLA MUN. RDO. BARROSO TABOSA", "SÃO VICENTE - ESCOLA MUN. JOAQUIM AQUILES XIMENES", "UBAÚNA - CEI ANTº AGUIAR NERI", "UBAÚNA - ESCOLA M. PEDRO CONRADO"], "FRECHEIRINHA": ["CENTRO DE FORMACAO FREI ANASTACIO - CEFRAN", "CENTRO EDUCACIONAL RAIMUNDO PEREIRA", "CRECHE FRANCISCA MARIA DO NASCIMENTO", "CRECHE INÊS EDITE PONTES", "CRECHE MANOEL FELIPE COSTA", "ESCOLA CARLOS MACHADO PORTELA", "ESCOLA DE ENSINO MÉDIO ANTONIO CUSTODIO", "ESCOLA FRANCISCO FERREIRA PONTES", "ESCOLA NAIR CUNHA DE AGUIAR", "PATRONATO SAO JOSE"], "MERUOCA": ["CAMARA MUNICIPAL DE MERUOCA", "CASA DA JUVENTUDE FRANCISCO JOSE CARLOS", "CASA DIGITAL(EEF - FRANCISCO ANDELMO)", "CRAS - CENTRO DE REFERÊNCIA DE ASSISTÊNCIA SOCIAL - BEM-ME-QUER", "EEF - DEPUTADO MANOEL RODRIGUES", "EEF - HENRIQUE SEVERINO DUARTE", "EEF - JOSE BARBALHO DO NASCIMENTO", "EEF - MARCAL LOPES DE VASCONCELOS", "EEF - MARIETA SALOMAO MENDES", "EEF - RAIMUNDO RODRIGUES DE ARAUJO", "EEFI MURILO PIO FERNANDES", "EEFM - MONSENHOR JOSE FURTADO", "EEIF - BEATRIZ SANFORD FROTA", "EEIF - DEPUTADO FRANCISCO MONTE", "EEIF - JOSE XIMENES ALBUQUERQUE", "EEIF - LUIZ GONZAGA FERNANDES", "EEIF - SIMAO BARBOSA", "PREFEITURA MUNICIPAL DE MERUOCA", "UNIVERSIDADE ABERTA DO BRASIL"], "SANTANA DO ACARAÚ": ["ALCIONE CLUBE", "ANEXO DA E.E.F. MANOEL FRANCISCO DA SILVA", "ASSOCIAÇÃO COMUNITÁRIA DONA LERNILSON", "ASSOCIAÇÃO COMUNITÁRIA DOS MORADORES DE CHOCALHO E DE CHINELO", "ASSOCIAÇÃO COMUNITÁRIA DOS TRABALHADORES DE SAPÓ", "ASSOCIAÇÃO COMUNITÁRIA SÃO GERARDO", "CAPELA CORAÇÃO DE JESUS", "CASA DE CULTURA ESCRIVAO ANTONIO RIOS", "CENTRO COMUNITÁRIO DA CONCEIÇÃO I", "CENTRO COMUNITÁRIO JOSÉ PATRIARCA CARNEIRO", "CENTRO COMUNITÁRIO JOÃO PAULO DE MARIA", "CENTRO DA ASSOCIACAO COMUNITARIA DE GREGORIO", "CENTRO DE EDUCAÇÃO INFANTIL YOLANDA QUEIROZ", "CENTRO DE PASTORAL FREI CRISTOVÃO", "CENTRO EDUCACIONAL MUNICIPAL JOAO CORDEIRO", "CENTRO SOCIAL MÃE CHIQUINHA", "COLÉGIO SANTANENSE", "CRAS - RAIMUNDO PEDRO DOS SANTOS", "E.E.F. SANTA ANA", "EEEP FRANCISCO DAS CHAGAS VASCONCELOS", "EEF ANTÔNIO FRANCISCO CANAFÍSTULA", "EEF FRANCISCA NEIDE DE SOUZA", "EEF FRANCISCO DAS CHAGAS FEIJAO", "EEF FRANCISCO MARQUES DA ROCHA", "EEF JESUS MARIA JOSÉ", "EEF JOAO PEIXOTO DA MOTA", "EEF JOSE OTILIO SABINO COSTA", "EEF JOSÉ PEREIRA DO NASCIMENTO", "EEF JOÃO ANANIAS VASCONCELOS", "EEF LOURENCO JOSE DE LIRA", "EEF MANOEL FRANCISCO DA SILVA", "EEF PEDRO ROSA DA COSTA", "EEF RAIMUNDO CAMÕES VIANA", "EEF SAO VICENTE DE PAULA", "EEIF PADRE SEVERIANO", "EEMPC JOSÉ FIDELES DE MOURA", "EEMTI NAZARÉ SEVERIANO", "EMEF ISAÍAS COELHO DO NASCIMENTO", "ESCOLA DE ENSINO FUNDAMENTAL JESUS MARIA JOSÉ", "ESCOLA DE ENSINO FUNDAMENTAL SANTA MARIA", "ESCOLA DE ENSINO FUNDAMENTAL SANTA TEREZINHA", "ESCOLA DE ENSINO FUNDAMENTAL SAO RAIMUNDO", "ESCOLA MUNICIPAL ANA DORALICE VASCONCELOS", "ESCOLA MUNICIPAL ANTÔNIO CARLOS CARNEIRO", "ESCOLA MUNICIPAL JOSÉ MARCIONILIO FARIAS", "ESCOLA SÃO FRANCISCO", "GRUPO ESCOLAR CORACAO DE JESUS", "GRUPO ESCOLAR CORACAO DE MARIA", "GRUPO ESCOLAR CORACY LOPES", "GRUPO ESCOLAR EDUARDO ROCHA", "GRUPO ESCOLAR JOSE RAIMUNDO CORDEIRO", "GRUPO ESCOLAR MARIA CATARINA VASCONCELOS", "GRUPO ESCOLAR MIGUEL ARCANJO DA MOTA", "GRUPO ESCOLAR SANTO ANTONIO", "GRUPO ESCOLAR SAO FRANCISCO", "GRUPO ESCOLAR SAO JOSE - MULUNGU", "GRUPO ESCOLAR SAO JOSE - RIACHO VERDE", "LOJA MAÇÔNICA DEUS E FRATERNIDADE", "PREFEITURA MUNICIPAL DE SANTANA DO ACARAU", "SALAO COMUNITARIO DA ASSOCIAÇÃO DE CAPIM-AÇU", "SALAO COMUNITARIO JOAO BATISTA DO NASCIMENTO", "SALÃO COMUNITÁRIO DO ENGENHO VELHO", "SALÃO COMUNITÁRIO DO SÃO MAURÍCIO", "SALÃO COMUNITÁRIO DOCA ZEFERINO", "SALÃO COMUNITÁRIO DOS PEQUENOS PRODUTORES DE RIACHO DO MEIO", "SINDICATO DOS TRABALHADORES RURAIS DE SANTANA"], "SENADOR SÁ": ["EEF ANTONIO COSTA NASCIMENTO", "EEF NOSSA SENHORA DO AMPARO", "EEF ZILDA OLIVEIRA AGUIAR", "GE CORONEL APOLIANO"]};
+
+var $ = function (id) { return document.getElementById(id); };
+var reconhecido = false, matriculaAtual = '';
+
+function limpar(m) { return String(m || '').toUpperCase().replace(/[^0-9A-Z]/g, ''); }
+function mostrar(el, classe, texto) { el.className = 'msg ' + classe; el.textContent = texto; el.hidden = false; }
+function chamar(params) {
+  var q = Object.keys(params).map(function (k) { return encodeURIComponent(k) + '=' + encodeURIComponent(params[k]); }).join('&');
+  return fetch(URL_SCRIPT + '?' + q, { method: 'GET', redirect: 'follow' }).then(function (r) { return r.json(); });
+}
+
+Object.keys(LOCAIS).forEach(function (m) { var o = document.createElement('option'); o.textContent = m; $('municipio').appendChild(o); });
+
+$('municipio').addEventListener('change', function () {
+  var sel = $('local'); sel.innerHTML = '';
+  var m = this.value;
+  if (!m) { sel.disabled = true; sel.innerHTML = '<option value="">Escolha primeiro o município</option>'; return; }
+  sel.disabled = false;
+  var o0 = document.createElement('option'); o0.value = ''; o0.textContent = 'Selecione'; sel.appendChild(o0);
+  LOCAIS[m].forEach(function (l) { var o = document.createElement('option'); o.textContent = l; sel.appendChild(o); });
+  var ou = document.createElement('option'); ou.value = '__OUTRO__'; ou.textContent = 'Não encontrei na lista'; sel.appendChild(ou);
+  $('blocoOutroLocal').hidden = true;
+});
+$('local').addEventListener('change', function () { $('blocoOutroLocal').hidden = this.value !== '__OUTRO__'; });
+
+Array.prototype.forEach.call(document.getElementsByName('area'), function (r) {
+  r.addEventListener('change', function () {
+    $('blocoArea').hidden = this.value !== 'SIM';
+    $('blocoFora').hidden = this.value !== 'NÃO';
+  });
+});
+
+$('btnConsultar').addEventListener('click', function () {
+  var m = limpar($('matricula').value), msg = $('msgConsulta');
+  msg.hidden = true;
+  if (m.length < 6) { mostrar(msg, 'erro', 'Digite a matrícula completa.'); return; }
+  if (URL_SCRIPT.indexOf('http') !== 0) { mostrar(msg, 'erro', 'Formulário ainda não configurado (falta o endereço do script).'); return; }
+  var b = this; b.disabled = true; b.textContent = 'Consultando...';
+  chamar({ acao: 'consultar', matricula: m }).then(function (r) {
+    matriculaAtual = m;
+    $('passo2').hidden = false;
+    if (r.ok && r.achou) {
+      reconhecido = true;
+      $('ficha').innerHTML = '';
+      var s = document.createElement('strong');
+      s.textContent = [r.pm.posto, r.pm.numeral, r.pm.nome].filter(Boolean).join(' ');
+      $('ficha').appendChild(s);
+      $('ficha').appendChild(document.createTextNode('Escalado em: ' + r.pm.escalado));
+      $('ficha').hidden = false; $('manual').hidden = true;
+      mostrar(msg, 'ok', 'Matrícula reconhecida. Confira seus dados e preencha abaixo.');
+    } else {
+      reconhecido = false;
+      $('ficha').hidden = true; $('manual').hidden = false;
+      mostrar(msg, 'aviso', 'Matrícula não encontrada na escala da Operação Eleições. Provavelmente você não está escalado ou digitou a matrícula errada. Confira o número; se estiver correto, preencha seus dados manualmente abaixo.');
+    }
+    $('passo2').scrollIntoView({ behavior: 'smooth' });
+  }).catch(function () {
+    mostrar(msg, 'erro', 'Não foi possível consultar agora. Verifique a internet e tente de novo.');
+  }).then(function () { b.disabled = false; b.textContent = 'Consultar'; });
+});
+
+$('btnVoltar').addEventListener('click', function () {
+  $('passo2').hidden = true; $('msgConsulta').hidden = true; $('matricula').focus();
+});
+
+$('btnEnviar').addEventListener('click', function () {
+  var msg = $('msgEnvio'); msg.hidden = true;
+  var area = (document.querySelector('input[name="area"]:checked') || {}).value;
+  var d = { acao: 'enviar', matricula: matriculaAtual, contato: $('contato').value.trim(), obs: $('obs').value.trim() };
+  if (!reconhecido) {
+    d.posto = $('posto').value; d.numeral = $('numeral').value.trim(); d.nome = $('nome').value.trim().toUpperCase();
+    d.opm = $('opm').value; d.escalado = $('escalado').value.trim();
+    if (!d.posto || !d.nome || !d.opm) { mostrar(msg, 'erro', 'Preencha posto/graduação, nome completo e companhia.'); return; }
+  }
+  if (!area) { mostrar(msg, 'erro', 'Informe se você vota na área do 3ºBPM.'); return; }
+  d.naArea = area;
+  if (area === 'SIM') {
+    d.municipio = $('municipio').value;
+    var l = $('local').value;
+    d.local = l === '__OUTRO__' ? ('OUTRO: ' + $('localTexto').value.trim()) : l;
+    if (!d.municipio || !l || (l === '__OUTRO__' && !$('localTexto').value.trim())) { mostrar(msg, 'erro', 'Selecione o município e o local de votação.'); return; }
+  } else {
+    d.municipio = $('cidadeFora').value.trim(); d.local = '';
+    if (!d.municipio) { mostrar(msg, 'erro', 'Informe a cidade onde vota.'); return; }
+  }
+  var b = this; b.disabled = true; b.textContent = 'Enviando...';
+  chamar(d).then(function (r) {
+    if (r.ok) { $('passo1').hidden = true; $('passo2').hidden = true; $('passo3').hidden = false; window.scrollTo(0, 0); }
+    else { mostrar(msg, 'erro', 'Não foi possível registrar: ' + (r.erro || 'erro desconhecido') + '. Tente de novo.'); }
+  }).catch(function () {
+    mostrar(msg, 'erro', 'Falha no envio. Verifique a internet e tente de novo.');
+  }).then(function () { b.disabled = false; b.textContent = 'Enviar'; });
+});
+
+$('btnNovo').addEventListener('click', function () { location.reload(); });
+</script>
+</body>
+</html>
